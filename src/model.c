@@ -31,5 +31,7 @@ double* model_output(Model* model) {
 	for(int i = 0; i < model->inputs; i++) {
 		for(int j = 0; j < model->inputs; j++)
 			y[i] += model->B[i][j] * model->u[j];
-	}	
+	}
+
+	return y;
 }
