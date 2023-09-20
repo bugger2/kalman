@@ -1,11 +1,10 @@
-CC:=g++
+CC:=clang
 CFLAGS=-g
 
 SRCDIR:=src
 OBJDIR:=obj
-INCDIR:=include
 
-SRC=$(wildcard $(SRCDIR)/*.cpp)
+SRC=$(wildcard $(SRCDIR)/*.c)
 OBJ=$(SRC:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 
 all: kalman
@@ -13,7 +12,7 @@ all: kalman
 kalman: $(OBJ)
 	$(CC) $(CFLAGS) -o $@ $^
 
-$(OBJDIR)/%.o: $(SRCDIR)/%.cpp | $(OBJDIR)
+$(OBJDIR)/%.o: $(SRCDIR)/%.c | $(OBJDIR)
 	$(CC) $(CFLAGS) -c $<
 
 $(OBJDIR):
