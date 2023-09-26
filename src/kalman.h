@@ -4,7 +4,7 @@
 #include "model.h"
 
 typedef struct Kalman {
-	Model* system; // system to estimate
+	Model system; // system to estimate
 	double** K; // kalman gain matrix
 	double** P; // error covariance matrix
 	double** Q; // process noise covariance matrix
