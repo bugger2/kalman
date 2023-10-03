@@ -1,7 +1,6 @@
-#include <stdio.h>
 #include "matrix.h"
 
-typdef struct Kalman_Filter
+typedef struct Kalman_Filter
 {
 	Matrix A; // states x states; system matrix
 	Matrix xhat; // states x 1; system estimate vector
@@ -13,22 +12,23 @@ typdef struct Kalman_Filter
 	Matrix K; // states x outputs; kalman gain
 	Matrix Q; // states x states; process noise covariance matrix
 	Matrix R; // outputs x outputs; measurement noise covariance matrix
-}
+} Kalman_Filter;
 
 // predict our state into the future based solely on our model
 void predict(Kalman_Filter* filter, Matrix* u)
 {
 	// x_future = Ax + Bu
-	Matrix Ax = matrix_multiply_matrix(&filter->A, &filter->xhat);
-	Matrix Bu = matrix_multiply_matrix(&filter->B, u);
+	Matrix Ax = matrix_times_matrix(&filter->A, &filter->xhat);
+	Matrix Bu = matrix_times_matrix(&filter->B, u);
 	filter->xhat = matrix_plus_matrix(&Ax, &Bu);
 	matrix_free(&Ax);
 	matrix_free(&Bu);
 
 	// P_priori_future = APA^T + Q
-	Matrix AP = matrix_multiply_matrix(filter->A, filter->P);
-	Matrix APAT = matrix_multiply_matrix(AP, matrix_transpose(filter->A));
-	filter->P = matrix_add_matrix(APAT, matrix->Q);
+	Matrix AP = matrix_times_matrix(&filter->A, &filter->P);
+	Matrix A_tranpose = matrix_transpose(&filter->A);
+	Matrix APAT = matrix_times_matrix(&AP, &A_tranpose);
+	filter->P = matrix_plus_matrix(&APAT, &filter->Q);
 	matrix_free(&AP);
 	matrix_free(&APAT);
 }

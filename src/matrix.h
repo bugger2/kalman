@@ -1,6 +1,8 @@
 #ifndef _MATRIX_H
 #define _MATRIX_H
 
+#include <sys/types.h>
+
 typedef struct
 {
 	double** array;
@@ -23,10 +25,13 @@ Matrix matrix_times_matrix(Matrix* mat1, Matrix* mat2);
 Matrix matrix_times_scalar(Matrix* matrix, double scalar);
 
 // get the sum of two matrices
-Matrix matrix_add_matrix(Matrix* mat1, Matrix* mat2);
+Matrix matrix_plus_matrix(Matrix* mat1, Matrix* mat2);
 
 // get the sum of a matrix and a scalar value
-Matrix matrix_add_scalar(Matrix* matrix, double scalar);
+Matrix matrix_plus_scalar(Matrix* matrix, double scalar);
+
+// returns the inverse of a matrix
+Matrix matrix_inverse(Matrix* matrix);
 
 void matrix_free(Matrix* matrix);
 

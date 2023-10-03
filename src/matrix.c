@@ -41,7 +41,7 @@ Matrix matrix_transpose(Matrix* matrix)
 	return ret;
 }
 
-Matrix matrix_multiply_matrix(Matrix* mat1, Matrix* mat2)
+Matrix matrix_times_matrix(Matrix* mat1, Matrix* mat2)
 {
 	// [m x n] * [n x p] = [m x p]. Will fail if n1 != n2.
 	// Basically, because of math, the amount of columns in the left matrix must be equal to the amount of rows in the right matrix
@@ -79,7 +79,7 @@ Matrix matrix_multiply_scalar(Matrix* matrix, double scalar)
 	return ret;
 }
 
-Matrix matrix_add_matrix(Matrix* mat1, Matrix* mat2)
+Matrix matrix_plus_matrix(Matrix* mat1, Matrix* mat2)
 {
 	// matrices must be of equal dimensions
 	assert(mat1->rows == mat2->rows && mat1->columns == mat2->columns);
@@ -97,7 +97,7 @@ Matrix matrix_add_matrix(Matrix* mat1, Matrix* mat2)
 	return ret;
 }
 
-Matrix matrix_add_scalar(Matrix* matrix, double scalar)
+Matrix matrix_plus_scalar(Matrix* matrix, double scalar)
 {
 	Matrix ret = matrix_init(matrix->rows, matrix->columns);
 
@@ -108,6 +108,19 @@ Matrix matrix_add_scalar(Matrix* matrix, double scalar)
 			matrix->array[i][j] = scalar;
 		}
 	}
+
+	return ret;
+}
+
+// get the inverse of a matrix
+Matrix matrix_inverse(Matrix* matrix)
+{
+	// FIXME: this function is not finished
+
+	// this only works with square matrices
+	assert(matrix->rows == matrix->columns);
+
+	Matrix ret = matrix_init(matrix->columns, matrix->rows);
 
 	return ret;
 }
