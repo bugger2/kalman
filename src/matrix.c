@@ -126,7 +126,7 @@ double matrix_determinant(Matrix* matrix)
 
 	double ret = 0;
 
-	if(matrix->rows != 2)
+	if(matrix->rows > 2)
 	{
 		for(size_t i = 0; i < matrix->columns; i++)
 		{
