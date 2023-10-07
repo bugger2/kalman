@@ -126,25 +126,30 @@ double matrix_determinant(Matrix* matrix)
 
 	double ret = 0;
 
-	for(size_t i = 0; i < matrix->columns; i++)
+	if(matrix->rows != 2)
 	{
-		Matrix temp_determ = matrix_init(matrix->rows - 1, matrix->columns - 1);
-		// initialization of temp_determ
-		for(size_t j = 0; j < temp_determ.rows; j++)
+		for(size_t i = 0; i < matrix->columns; i++)
 		{
-			// used to skip over the column from the matrix passed to the function that goes unused
-			int offset = 0;
-			for(size_t k = 0; k < temp_determ.columns; k++)
+			Matrix temp_determ = matrix_init(matrix->rows - 1, matrix->columns - 1);
+			// initialization of temp_determ
+			for(size_t j = 0; j < temp_determ.rows; j++)
 			{
-				if(k != i) {
-					temp_determ.array[j][k] = matrix->array[j+1][k+offset];
-				} else {
-					offset = 1;
+				// used to skip over the column from the matrix passed to the function that goes unused
+				int offset = 0;
+				for(size_t k = 0; k < temp_determ.columns; k++)
+				{
+					if(k != i) {
+						temp_determ.array[j][k] = matrix->array[j+1][k+offset];
+					} else {
+						offset = 1;
+					}
 				}
 			}
-		}
 
-		ret += powf(-1, i) * matrix->array[0][i] * matrix_determinant(&temp_determ);
+			ret += powf(-1, i) * matrix->array[0][i] * matrix_determinant(&temp_determ);
+		}
+	} else {
+		ret = matrix->array[0][0] * matrix->array[1][1] - matrix->array[0][1] * matrix->array[1][0];
 	}
 
 	return ret;
