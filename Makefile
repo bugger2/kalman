@@ -1,5 +1,5 @@
 CC:=clang
-CFLAGS=-g
+CFLAGS=-g -lm
 
 SRCDIR:=src
 OBJDIR:=obj

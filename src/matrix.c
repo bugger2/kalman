@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -107,6 +108,43 @@ Matrix matrix_plus_scalar(Matrix* matrix, double scalar)
 		{
 			matrix->array[i][j] = scalar;
 		}
+	}
+
+	return ret;
+}
+
+// compute the determinant of a square matrix with laplace expansion
+double matrix_determinant(Matrix* matrix)
+{
+	// this probably doesn't make much sense on it's own, and I would be writing
+	// more comments than code if I tried to explain it. I suggest reading the
+	// following for a good understanding
+	// https://en.wikipedia.org/wiki/Laplace_expansion
+
+	// this only works with square matrices
+	assert(matrix->rows == matrix->columns);
+
+	double ret = 0;
+
+	for(size_t i = 0; i < matrix->columns; i++)
+	{
+		Matrix temp_determ = matrix_init(matrix->rows - 1, matrix->columns - 1);
+		// initialization of temp_determ
+		for(size_t j = 0; j < temp_determ.rows; j++)
+		{
+			// used to skip over the column from the matrix passed to the function that goes unused
+			int offset = 0;
+			for(size_t k = 0; k < temp_determ.columns; k++)
+			{
+				if(k != i) {
+					temp_determ.array[j][k] = matrix->array[j+1][k+offset];
+				} else {
+					offset = 1;
+				}
+			}
+		}
+
+		ret += powf(-1, i) * matrix->array[0][i] * matrix_determinant(&temp_determ);
 	}
 
 	return ret;

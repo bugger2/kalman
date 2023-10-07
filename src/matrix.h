@@ -30,6 +30,9 @@ Matrix matrix_plus_matrix(Matrix* mat1, Matrix* mat2);
 // get the sum of a matrix and a scalar value
 Matrix matrix_plus_scalar(Matrix* matrix, double scalar);
 
+// find the determinant of an arbitrarily sized square matrix with laplace expansion
+double matrix_determinant(Matrix* matrix);
+
 // returns the inverse of a matrix
 Matrix matrix_inverse(Matrix* matrix);
 
