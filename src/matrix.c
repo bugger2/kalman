@@ -113,6 +113,23 @@ Matrix matrix_plus_scalar(Matrix* matrix, double scalar)
 	return ret;
 }
 
+Matrix matrix_minor(Matrix* matrix, size_t row, size_t column)
+{
+	Matrix ret = matrix_init(matrix->rows, matrix->columns);
+
+	for(size_t i = 0; i < matrix->rows; i++)
+	{
+		if(i != row)
+		{
+			for(size_t j = 0; j < matrix->columns; j++) {
+				if(j != column) ret.array[i][j] = matrix->array[i][j];
+			}
+		}
+	}
+
+	return ret;
+}
+
 // compute the determinant of a square matrix with laplace expansion
 double matrix_determinant(Matrix* matrix)
 {
@@ -130,28 +147,41 @@ double matrix_determinant(Matrix* matrix)
 	{
 		for(size_t i = 0; i < matrix->columns; i++)
 		{
-			Matrix temp_determ = matrix_init(matrix->rows - 1, matrix->columns - 1);
-			// initialization of temp_determ
-			for(size_t j = 0; j < temp_determ.rows; j++)
-			{
-				// used to skip over the column from the matrix passed to the function that goes unused
-				int offset = 0;
-				for(size_t k = 0; k < temp_determ.columns; k++)
-				{
-					if(k != i) {
-						temp_determ.array[j][k] = matrix->array[j+1][k+offset];
-					} else {
-						offset = 1;
-					}
-				}
-			}
-
+			Matrix temp_determ = matrix_minor(matrix, 0, i);
 			ret += powf(-1, i) * matrix->array[0][i] * matrix_determinant(&temp_determ);
+			matrix_free(&temp_determ);
 		}
 	} else {
 		ret = matrix->array[0][0] * matrix->array[1][1] - matrix->array[0][1] * matrix->array[1][0];
 	}
 
+	return ret;
+}
+
+// calculate the cofactor matrix of the supplied matrix
+Matrix matrix_cofactor(Matrix* matrix)
+{
+	Matrix ret = matrix_init(matrix->rows, matrix->columns);
+		
+	for(size_t i = 0; i < matrix->rows; i++)
+	{
+		for(size_t j = 0; j < matrix->columns; j++)
+		{
+			Matrix temp_minor = matrix_minor(matrix, i, j);
+			ret.array[i][j] = matrix_determinant(&temp_minor);
+			matrix_free(&temp_minor);
+		}
+	}
+
+	return ret;
+}
+
+// calculate the transpose of the cofactor of the supplied matrix
+Matrix matrix_adjoint(Matrix* matrix)
+{
+	Matrix temp = matrix_cofactor(matrix);
+	Matrix ret = matrix_transpose(&temp);
+	matrix_free(&temp);
 	return ret;
 }
 
@@ -163,7 +193,10 @@ Matrix matrix_inverse(Matrix* matrix)
 	// this only works with square matrices
 	assert(matrix->rows == matrix->columns);
 
-	Matrix ret = matrix_init(matrix->columns, matrix->rows);
+	// inverse = 1/determinant * adjoint
+	Matrix adjoint = matrix_adjoint(matrix);
+	Matrix ret = matrix_times_scalar(&adjoint, (1/matrix_determinant(matrix)));
+	matrix_free(&adjoint);
 
 	return ret;
 }
@@ -175,4 +208,5 @@ void matrix_free(Matrix* matrix)
 		free(matrix->array[i]);
 	}
 	free(matrix->array);
+	free(matrix);
 }
