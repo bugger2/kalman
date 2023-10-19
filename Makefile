@@ -1,9 +1,10 @@
-CC:=clang
-CFLAGS=-g -lm
-
 SRCDIR:=src
 OBJDIR:=obj
+INCDIR:=include
+LIBDIR:=libs
 
+CC:=clang
+CFLAGS=-g -I$(INCDIR) -lm
 SRC=$(wildcard $(SRCDIR)/*.c)
 OBJ=$(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.o,$(SRC))
 
@@ -17,6 +18,12 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.c | $(OBJDIR)
 
 $(OBJDIR):
 	mkdir -p $@
+
+$(LIBDIR):
+	mkdir $(LIBDIR)
+
+$(INCDIR):
+	mkdir $(INCDIR)
 
 clean:
 	rm -rf $(OBJDIR) kalman
