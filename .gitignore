@@ -3,7 +3,8 @@ kalman
 
 # library files
 include
-src/matrix.c
+matrix.h
+matrix.c
 
 # Prerequisites
 *.d
