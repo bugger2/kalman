@@ -18,15 +18,15 @@ typedef struct Kalman_Filter
 void predict(Kalman_Filter* filter, Matrix* u)
 {
     // x_future = Ax + Bu
-    Matrix Ax = matrix_times_matrix(&filter->A, &filter->xhat);
-    Matrix Bu = matrix_times_matrix(&filter->B, u);
+    Matrix* Ax = matrix_times_matrix(&filter->A, &filter->xhat);
+    Matrix* Bu = matrix_times_matrix(&filter->B, u);
     filter->xhat = *matrix_plus_matrix(Ax, Bu);
     matrix_free(Ax);
     matrix_free(Bu);
 
     // P_priori_future = APA^T + Q
-    Matrix AP = matrix_times_matrix(&filter->A, &filter->P);
-    Matrix APAt = matrix_times_matrix(AP, matrix_transpose(&filter->A));
+    Matrix* AP = matrix_times_matrix(&filter->A, &filter->P);
+    Matrix* APAt = matrix_times_matrix(AP, matrix_transpose(&filter->A));
     filter->P = *matrix_plus_matrix(APAt, &filter->Q);
     matrix_free(APAt);
     matrix_free(AP);
@@ -36,11 +36,11 @@ void predict(Kalman_Filter* filter, Matrix* u)
 void update(Kalman_Filter* filter, Matrix* y, Matrix* u)
 {
     // K_future = P_priori_future * C^T * (C * P_priori_future * C^T + R)^-1
-    Matrix CPCtPlusR = matrix_plus_matrix(matrix_times_matrix(
+    Matrix* CPCtPlusR = matrix_plus_matrix(matrix_times_matrix(
 															  matrix_times_matrix(&filter->C, &filter->P),
 															  matrix_transpose(&filter->C)),
                                           &filter->R);
-    Matrix PCt = matrix_times_matrix(&filter->P, matrix_transpose(&filter->C));
+    Matrix* PCt = matrix_times_matrix(&filter->P, matrix_transpose(&filter->C));
     
     filter->K = *matrix_times_matrix(PCt, matrix_inverse(CPCtPlusR));
     
@@ -52,7 +52,7 @@ void update(Kalman_Filter* filter, Matrix* y, Matrix* u)
 																	 matrix_times_matrix(&filter->C, &filter->xhat),
 																	 matrix_times_matrix(&filter->D, u)
 																	 ));
-	filter->xhat = *matrix_plus_matrix(filter->xhat, matrix_times_matrix(filter->K, outputError));
+	filter->xhat = *matrix_plus_matrix(&filter->xhat, matrix_times_matrix(&filter->K, outputError));
     matrix_free(outputError);
 
     // P_posteriori_future = (I - K_future * C) * P_priori_future
