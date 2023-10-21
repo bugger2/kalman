@@ -18,20 +18,18 @@ typedef struct Kalman_Filter
 void predict(Kalman_Filter* filter, Matrix* u)
 {
     // x_future = Ax + Bu
-    Matrix Ax = *matrix_times_matrix(&filter->A, &filter->xhat);
-    Matrix Bu = *matrix_times_matrix(&filter->B, u);
-    filter->xhat = *matrix_plus_matrix(&Ax, &Bu);
-    matrix_free(&Ax);
-    matrix_free(&Bu);
+    Matrix Ax = matrix_times_matrix(&filter->A, &filter->xhat);
+    Matrix Bu = matrix_times_matrix(&filter->B, u);
+    filter->xhat = *matrix_plus_matrix(Ax, Bu);
+    matrix_free(Ax);
+    matrix_free(Bu);
 
     // P_priori_future = APA^T + Q
-    Matrix AP = *matrix_times_matrix(&filter->A, &filter->P);
-    Matrix A_transpose = *matrix_transpose(&filter->A);
-    Matrix APAt = *matrix_times_matrix(&AP, &A_transpose);
-    filter->P = *matrix_plus_matrix(&APAt, &filter->Q);
-    matrix_free(&AP);
-    matrix_free(&APAt);
-    matrix_free(&A_transpose);
+    Matrix AP = matrix_times_matrix(&filter->A, &filter->P);
+    Matrix APAt = matrix_times_matrix(AP, matrix_transpose(&filter->A));
+    filter->P = *matrix_plus_matrix(APAt, &filter->Q);
+    matrix_free(APAt);
+    matrix_free(AP);
 }
 
 // update our prediction by incorporating measurements
@@ -54,13 +52,13 @@ void update(Kalman_Filter* filter, Matrix* y, Matrix* u)
 																	 matrix_times_matrix(&filter->C, &filter->xhat),
 																	 matrix_times_matrix(&filter->D, u)
 																	 ));
-	filter->xhat = matrix_plus_matrix(filter->xhat, matrix_times_matrix(filter->K, outputError));
+	filter->xhat = *matrix_plus_matrix(filter->xhat, matrix_times_matrix(filter->K, outputError));
     matrix_free(outputError);
 
     // P_posteriori_future = (I - K_future * C) * P_priori_future
     // FIXME I'm pretty sure the dimensionality of KC as the matrix library is written now does not produce a square matrix
     Matrix* temp = matrix_minus_matrix(matrix_identity(filter->A.rows), matrix_times_matrix(&filter->K, &filter->C));
-    filter->P = matrix_times_matrix(temp, &filter->P);
+    filter->P = *matrix_times_matrix(temp, &filter->P);
     matrix_free(temp);
 }
 
