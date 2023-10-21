@@ -38,20 +38,30 @@ void predict(Kalman_Filter* filter, Matrix* u)
 void update(Kalman_Filter* filter, Matrix* y, Matrix* u)
 {
     // K_future = P_priori_future * C^T * (C * P_priori_future * C^T + R)^-1
-    Matrix CPCtPlusR = *matrix_plus_matrix(matrix_times_matrix(
-                                                       matrix_times_matrix(&filter->C, &filter->P),
-                                                       matrix_transpose(&filter->C)),
-                                           &filter->R);
-    Matrix PCt = *matrix_times_matrix(&filter->P, matrix_transpose(&filter->C));
+    Matrix CPCtPlusR = matrix_plus_matrix(matrix_times_matrix(
+															  matrix_times_matrix(&filter->C, &filter->P),
+															  matrix_transpose(&filter->C)),
+                                          &filter->R);
+    Matrix PCt = matrix_times_matrix(&filter->P, matrix_transpose(&filter->C));
     
-    filter->K = *matrix_times_matrix(&PCt, matrix_inverse(&CPCtPlusR));
+    filter->K = *matrix_times_matrix(PCt, matrix_inverse(CPCtPlusR));
     
-    matrix_free(&CPCtPlusR);
-    matrix_free(&PCt);
+    matrix_free(CPCtPlusR);
+    matrix_free(PCt);
 
     // x_posteriori_future = x_priori_future + K_future * (y - C * x_priori_future - D * u_future)
+	Matrix* outputError = matrix_minus_matrix(y, matrix_minus_matrix(
+																	 matrix_times_matrix(&filter->C, &filter->xhat),
+																	 matrix_times_matrix(&filter->D, u)
+																	 ));
+	filter->xhat = matrix_plus_matrix(filter->xhat, matrix_times_matrix(filter->K, outputError));
+    matrix_free(outputError);
 
     // P_posteriori_future = (I - K_future * C) * P_priori_future
+    // FIXME I'm pretty sure the dimensionality of KC as the matrix library is written now does not produce a square matrix
+    Matrix* temp = matrix_minus_matrix(matrix_identity(filter->A.rows), matrix_times_matrix(&filter->K, &filter->C));
+    filter->P = matrix_times_matrix(temp, &filter->P);
+    matrix_free(temp);
 }
 
 int main(void)
