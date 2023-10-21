@@ -1,11 +1,6 @@
 # the binary
 kalman
 
-# library files
-include
-matrix.h
-matrix.c
-
 # Prerequisites
 *.d
 
